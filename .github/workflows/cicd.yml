@@ -1,4 +1,4 @@
-name: Deploy to AWS Lambda
+name: CI/CD
 on:
   push:
     branches:
@@ -13,7 +13,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@2
+        uses: actions/checkout@v2
       
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
@@ -39,22 +39,22 @@ jobs:
           zip -r ../function.zip *
           cd ..
       
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-action/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION}}
 
-      - name: Publish dependencies layer
+      - name: Publish dependencies layer to AWS Lambda
         run: |
           RESULT=$(aws lambda publish-layer-version --layer-name "${secrets.AWS_LAMBDA_LAYER_ARN}" --zip-file fileb://dependencies.zip)
           LAYER_VERSION=$(jq '.Version' <<< "${RESULT}")
     
-      - name: Publish function layer
+      - name: Publish function layer to AWS Lambda
         run: |
           aws lambda update-function-code --function-name "${secrets.AWS_LAMBDA_FUNCTION_NAME}" --zip-file fileb://function.zip
 
-      - name: Update configuration
+      - name: Update configuration for AWS Lambda
         run: |
           aws lambda update-function-configuration --function-name "${secrets.AWS_LAMBDA_FUNCTION_NAME}" --layers "${secrets.AWS_LAMBDA_LAYER_ARN}:${LAYER_VERSION}"
