@@ -15,8 +15,9 @@ COPY scripts/. tweetbrief/. Pipfile Pipfile.lock /app/
 WORKDIR /app
 
 RUN chmod +x container-startup.sh tweetbrief-execution.sh
-RUN pip install --no-cache-dir pipenv
-RUN pipenv lock --requirements > requirements.txt \
-    && pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --upgrade pip \
+    && python -m pip install pipenv \
+    && python -m pipenv lock --requirements > requirements.txt \
+    && python -m pip install --no-cache-dir -r requirements.txt
 
 CMD ["/app/container-startup.sh"] 

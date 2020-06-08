@@ -1,0 +1,60 @@
+name: Deploy to AWS Lambda
+on:
+  push:
+    branches:
+      - feature/aws-deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@2
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pipenv
+          python -m pipenv lock --requirements > requirements.txt
+          python -m pip install -r requirements.txt --target dependencies
+      
+      - name: Zip dependencies
+        run: |
+          cd dependencies
+          zip  -r ../dependencies.zip *
+          cd ..
+      
+      - name: Zip function
+        run: |
+          cd "${SRC_DIR}"
+          zip -r ../function.zip *
+          cd ..
+      
+      - name: Configure AWS Credentials
+        uses: aws-action/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION}}
+
+      - name: Publish dependencies layer
+        run: |
+          RESULT=$(aws lambda publish-layer-version --layer-name "${secrets.AWS_LAMBDA_LAYER_ARN}" --zip-file fileb://dependencies.zip)
+          LAYER_VERSION=$(jq '.Version' <<< "${RESULT}")
+    
+      - name: Publish function layer
+        run: |
+          aws lambda update-function-code --function-name "${secrets.AWS_LAMBDA_FUNCTION_NAME}" --zip-file fileb://function.zip
+
+      - name: Update configuration
+        run: |
+          aws lambda update-function-configuration --function-name "${secrets.AWS_LAMBDA_FUNCTION_NAME}" --layers "${secrets.AWS_LAMBDA_LAYER_ARN}:${LAYER_VERSION}"
