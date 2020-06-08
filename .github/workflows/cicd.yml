@@ -47,14 +47,22 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION}}
 
       - name: Publish dependencies layer to AWS Lambda
+        env: 
+          AWS_LAMBDA_LAYER_ARN: ${{ secrets.AWS_LAMBDA_LAYER_ARN }}
         run: |
-          RESULT=$(aws lambda publish-layer-version --layer-name "${secrets.AWS_LAMBDA_LAYER_ARN}" --zip-file fileb://dependencies.zip)
+          RESULT=$(aws lambda publish-layer-version --layer-name "${AWS_LAMBDA_LAYER_ARN}" --zip-file fileb://dependencies.zip)
           LAYER_VERSION=$(jq '.Version' <<< "${RESULT}")
+          echo "::set-env name=LAYER_VERSION::$LAYER_VERSION"
     
       - name: Publish function layer to AWS Lambda
+        env:
+          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}
         run: |
-          aws lambda update-function-code --function-name "${secrets.AWS_LAMBDA_FUNCTION_NAME}" --zip-file fileb://function.zip
+          aws lambda update-function-code --function-name "${AWS_LAMBDA_FUNCTION_NAME}" --zip-file fileb://function.zip
 
       - name: Update configuration for AWS Lambda
+        env:
+          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}
+          AWS_LAMBDA_LAYER_ARN: ${{ secrets.AWS_LAMBDA_LAYER_ARN }}
         run: |
-          aws lambda update-function-configuration --function-name "${secrets.AWS_LAMBDA_FUNCTION_NAME}" --layers "${secrets.AWS_LAMBDA_LAYER_ARN}:${LAYER_VERSION}"
+          aws lambda update-function-configuration --function-name "${AWS_LAMBDA_FUNCTION_NAME}" --layers "${AWS_LAMBDA_LAYER_ARN}:${LAYER_VERSION}"
