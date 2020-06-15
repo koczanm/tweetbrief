@@ -124,11 +124,15 @@ else
 fi
 
 echo "Bulding Python function ..."
+
 docker build -t tweetbrief-aws -f Dockerfile.aws .
 
 echo "Deploying Python function to Lambda ..."
+
 docker run --rm \
     -e AWS_ACCESS_KEY_ID \
     -e AWS_SECRET_ACCESS_KEY \
     -e AWS_DEFAULT_REGION \
     tweetbrief-aws 
+
+echo "Deployment completed successfully"
