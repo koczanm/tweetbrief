@@ -7,7 +7,7 @@ from yattag import Doc
 from exporter.styles import html_style
 from qr.qrcoder import QRCoder
 from twitterapi.simple_tweet import SimpleTweet
-from datetime import date, datetime
+
 
 class HTMLExporter:
     def __init__(self, url2qrcode: bool = False) -> None:
@@ -15,7 +15,7 @@ class HTMLExporter:
         self.doc = Doc()
         self.url2qrcode = url2qrcode
 
-    def as_string(self, tweets: List[SimpleTweet], title: str, subtitle: str) -> str:
+    def as_string(self, tweets: List[SimpleTweet]) -> str:
         self.logger.info("Generating HTML...")
 
         tag = self.doc.tag
@@ -24,10 +24,6 @@ class HTMLExporter:
         with tag("html"):
             with tag("head"):
                 self.doc.asis(html_style)
-            with tag("h1"):
-                text(title)
-            with tag("h2"):
-                text(subtitle)
             with tag("body"):
                 with tag("div", klass="container"):
                     for tweet in tweets:
@@ -45,22 +41,17 @@ class HTMLExporter:
             urls = tweet.extract_urls(remove_http=True)
             tweet.replace_urls("[QR]")
 
-        with tag("div", klass="tweet-box"):
-            with tag("div", klass="tweet-box-content"):
-                with tag("div", klass="tweet-text"):
-                    with tag("b"):
-                        text(f"{tweet.author}: ")
-                    text(tweet.text)
-                if self.url2qrcode:
-                    qrcoder = QRCoder(box_size=5, border=0)
-                    for url in urls:
-                        with tag("div", klass="tweet-qrcode"):
-                            self._inline_svg2data_uri(qrcoder.generate_inline_svg(url))
-            with tag("div", klass="tweet-stats"):
-                with tag("div"):
-                    text (f"{tweet.created_at} ➥{tweet.retweet_count} ★{tweet.favorite_count}")
-                with tag("div"):
-                    text (f"@{tweet.uid} id:{tweet.id}")
-    
+        with tag("div", klass="tweet"):
+            with tag("div", klass="tweet-text"):
+                with tag("b"):
+                    text(f"{tweet.author}: ")
+                text(tweet.text)
+
+            if self.url2qrcode:
+                qrcoder = QRCoder(box_size=5, border=0)
+                for url in urls:
+                    with tag("div", klass="tweet-qrcode"):
+                        self._inline_svg2data_uri(qrcoder.generate_inline_svg(url))
+
     def _inline_svg2data_uri(self, inline_svg: str) -> None:
         self.doc.stag("img", src=f"data:image/svg+xml;charset=utf-8;base64,{b64encode(inline_svg).decode()}")
