@@ -8,7 +8,7 @@ Wouldn't it be nice and relaxing to be able to stay up to date with one's own Tw
 
 ## What
 
-This project is a user-controlled automation (packaged to conveniently run in a  docker container) for generating daily Twitter briefs. This machinery expects only a few essential input parameter:
+This project is a user-controlled automation (packaged to conveniently run in a  docker container) for generating daily Twitter briefs. This machinery expects only a few essential input parameters:
 
 - `CONSUMER_KEY`
 
