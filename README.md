@@ -112,7 +112,7 @@ Uploading files to Dropbox is implemented using the Python package [dropbox](htt
 
 An automated deployment to AWS is performed using a CloudFormation template which describe all resources, roles and permissions needed to execute the application. In addition, a GitHub Workflow is configured so the deployment is triggered on every push to the master branch.
 
-## DEBUG
+## Debug
 
 The following commands might be helpful in debugging:
 
