@@ -15,7 +15,7 @@ class HTMLExporter:
         self.logger = logging.getLogger(__name__)
         self.doc = Doc()
         self.url2qrcode = url2qrcode
-        self.qrcoder = QRCoder(box_size=5, border=0)
+        self.qrcoder = QRCoder(5, 0)
 
     def as_string(self, tweets: List[SimpleTweet], title: str, subtitle: str) -> str:
         self.logger.info("Generating HTML...")
@@ -26,11 +26,11 @@ class HTMLExporter:
         with tag("html"):
             with tag("head"):
                 self.doc.asis(html_style)
-            with tag("h1"):
-                text(title)
-            with tag("h2"):
-                text(subtitle)
             with tag("body"):
+                with tag("div", klass="title"):
+                    text(title)
+                with tag("div", klass="subtitle"):
+                    text(subtitle)
                 with tag("div", klass="container"):
                     for tweet in tweets:
                         self._tweet2html(tweet)
@@ -48,9 +48,9 @@ class HTMLExporter:
             tweet.replace_urls("[QR]")
 
         with tag("div", klass="tweet-box"):
-            with tag("div", klass="tweet-box-content"):
+            with tag("div", klass="tweet-content"):
                 with tag("div", klass="tweet-text"):
-                    with tag("b"):
+                    with tag("span", klass="tweet-author"):
                         text(f"{tweet.author}: ")
                     text(tweet.text)
                 if self.url2qrcode:
