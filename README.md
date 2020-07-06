@@ -8,7 +8,7 @@ Wouldn't it be nice and relaxing to be able to stay up to date with one's own Tw
 
 ## What
 
-This project is a user-controlled automation (packaged to conveniently run in a  docker container) for generating daily Twitter briefs. This machinery expects only a few essential input parameter:
+This project is a user-controlled automation (packaged to conveniently run in a  docker container) for generating daily Twitter briefs. This machinery expects only a few essential input parameters:
 
 - `CONSUMER_KEY`
 
@@ -26,7 +26,7 @@ Once given the above parameters, the following algorithm is used to assemble a d
 
 2. The set of accounts being followed by the `TARGET_USERNAME` is read.
 
-3. For each of these followed account, the list of max. 3 "top" tweets are read from that account's feed.
+3. For each of these followed accounts, the list of max. 3 "top" tweets are read from that account's feed.
 
 4. All these lists of the "top" tweets from all the followed accounts are combined into one single list. This combined  list is then sorted and trimmed
 so it fits on one page when tweets are printed (yes, that means lots of trimming!).
@@ -104,6 +104,10 @@ To obtain them, a Twitter Developer Account is needed and it must be verified by
 
 The whole procedure is described at this [link](https://developer.twitter.com/en/docs/basics/apps/overview).
 
+### PDF
+
+The PDF files are generated using the Python package [weasyprint](https://github.com/Kozea/WeasyPrint), which allow to convert an HTML page to a PDF page. From many available solutions this one was chosen beacuse of CSS flexbox and columns support which made it easy to generate 2-columns page PDF files.
+
 ### Dropbox
 
 Uploading files to Dropbox is implemented using the Python package [dropbox](https://github.com/dropbox/dropbox-sdk-python) which is the official Dropbox API Client for integrating with the Dropbox API v2. Its use requires the creation of a Dropbox App which will allow to get an access token. The detailed instruction is available at this [link](https://www.dropbox.com/developers/reference/getting-started#app%20console).
@@ -112,7 +116,7 @@ Uploading files to Dropbox is implemented using the Python package [dropbox](htt
 
 An automated deployment to AWS is performed using a CloudFormation template which describe all resources, roles and permissions needed to execute the application. In addition, a GitHub Workflow is configured so the deployment is triggered on every push to the master branch.
 
-## DEBUG
+## Debug
 
 The following commands might be helpful in debugging:
 
