@@ -11,6 +11,7 @@ from dropbox.exceptions import ApiError, AuthError, BadInputError
 
 from exporter.pdf_exporter import PDFExporter
 from twitterapi.tweet_extractor import TweetExtractor
+from utils.parser import str2bool
 
 logger = logging.getLogger()
 if logger.hasHandlers():
@@ -47,7 +48,7 @@ def main() -> None:
     single_author_max_tweets = os.getenv("SINGLE_AUTHOR_MAX_TWEETS", 3)
     brief_period = os.getenv("BRIEF_PERIOD", 1)
     brief_max_tweets = os.getenv("BRIEF_MAX_TWEETS", 30)
-    url2qrcode = os.getenv("URL2QR", True)
+    url2qrcode = str2bool(os.getenv("URL2QR", "True"))
 
     # storage parameters
     brief_output = os.getenv("BRIEF_OUTPUT", None)
@@ -74,11 +75,6 @@ def main() -> None:
     except ValueError:
         logger.warning("BRIEF_MAX_TWEETS must be an integer! Setting to default (30) ...")
         brief_max_tweets = 30
-
-    try:
-        url2qrcode = bool(url2qrcode)
-    except ValueError:
-        logger.warning("URL2QR must be a boolean! Setting to default (True) ...")
 
     if brief_output is not None:
         try:
