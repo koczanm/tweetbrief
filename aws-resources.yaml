@@ -19,6 +19,10 @@ Resources:
           CONSUMER_SECRET: !Ref ConsumerSecret
           DROPBOX_ACCESS_TOKEN: !Ref DropboxAccessToken
           TARGET_USERNAME: !Ref TargetUsername
+          BRIEF_PERIOD: !Ref BriefPeriod
+          BRIEF_MAX_TWEETS: !Ref BriefMaxTweets
+          SINGLE_AUTHOR_MAX_TWEETS: !Ref SingleAuthorMaxTweets
+          URL2QR: !Ref URL2QR
   TweetbriefRole:
     Type: AWS::IAM::Role
     Properties:
@@ -66,14 +70,36 @@ Resources:
 Parameters:
   ConsumerKey:
     Type: String
+    Description: An authentication key to query Twitter API.
   ConsumerSecret:
     Type: String
+    Description: An authentication secret to query Twitter API.
   DropboxAccessToken:
     Type: String
+    Description: An access token to save briefs on Dropbox.
   TargetUsername:
     Type: String
+    Description: A target Twitter account. 
   BriefPeriod:
     Type: Number
+    Description: The period of time, in days (24h), defining the window time of which tweets to gather.
     Default: 1
     MinValue: 1
-    MaxValue: 7
+  BriefMaxTweets:
+    Type: Number
+    Description: The maximum number of tweets to include in a brief.
+    Default: 32
+    MinValue: 1
+  SingleAuthorMaxTweets:
+    Type: Number
+    Description: The maximum number of tweets from one user to include.
+    Default: 3
+    MinValue: 1
+    MaxValue: 3
+  URL2QR:
+    Type: String
+    Description: The flag indicating whether URLs should be converted to QR codes.
+    Default: "True"
+    AllowedValues:
+      - "True"
+      - "False"

@@ -20,4 +20,4 @@ services:
       - BRIEF_PERIOD=1
       - BRIEF_MAX_TWEETS=32
       - SINGLE_AUTHOR_MAX_TWEETS=2
-      - URL2QR=False
+      - URL2QR=True
